@@ -21,13 +21,12 @@ def CCL(img):
             if img_gray[i, j] != 0:
 
                 # Update neighbor labels
-                if regions == []:
-                    regions.append({(i, j)})
-                elif i != 0:
+                if i != 0:
                     for reg_num in range(len(regions)):
                         if (i - 1, j) in regions[reg_num]:
                             top_neighbor_label = reg_num + 1
-                elif j != 0:
+                            
+                if j != 0:
                     for reg_num in range(len(regions)):
                         if (i, j - 1) in regions[reg_num]:
                             left_neighbor_label = reg_num + 1
