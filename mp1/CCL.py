@@ -55,6 +55,7 @@ def CCL(img):
                         else:
                             region_equivs.append({left_neighbor_label, top_neighbor_label})
 
+    # Removing redundant region labels, if necessary
     redundant_inds = []
     if region_equivs != []:
         for equiv in region_equivs:
@@ -64,8 +65,16 @@ def CCL(img):
                 regions[min_label - 1] | regions[label - 1]
                 redundant_inds.append(label - 1)
         redundant_inds.sort(reverse=True)
+        for ind in redundant_inds:
+            regions.pop(ind)
 
-    for ind in redundant_inds:
-        regions.pop(ind)
+    # Generating different colors for labeling and updating pixels
+    shades = np.linspace(0, 255, len(regions))
+    for region_ind in range(len(regions)):
+        for pixel in regions[region_ind]:
+            img_gray[pixel[0], pixel[1]] = shades[region_ind]
 
-    
+    label_img = img
+    label_img[:, :, 2] = img_gray
+
+    return label_img,len(regions)
