@@ -2,8 +2,9 @@ import cv2
 import numpy as np
 
 def CCL(img):
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    rows, cols, channels = img_gray.shape
+    label_img = np.copy(img)
+    img_gray = cv2.cvtColor(label_img, cv2.COLOR_BGR2GRAY)
+    rows, cols = img_gray.shape
 
     regions = []
     region_equivs = []
@@ -74,7 +75,8 @@ def CCL(img):
         for pixel in regions[region_ind]:
             img_gray[pixel[0], pixel[1]] = shades[region_ind]
 
-    label_img = img
+    label_img[:, :, 0] = 0
+    label_img[:, :, 1] = 0
     label_img[:, :, 2] = img_gray
 
     return label_img,len(regions)
