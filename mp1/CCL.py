@@ -100,9 +100,6 @@ def CCL(img, use_size_filter=False, filter_thresh=0):
             if len(regions[i]) >= filter_thresh:
                 filtered_inds.append(i)
         regions = [regions[passed_ind] for passed_ind in filtered_inds]
-            
-    # for region in regions:
-    #     print(len(region))
 
     # Generating different colors for labeling and updating pixels
     if len(regions) == 1:
