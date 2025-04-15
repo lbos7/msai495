@@ -2,12 +2,20 @@ import cv2
 import numpy as np
 
 def CCL(img):
-    label_img = np.copy(img)
-    img_gray = cv2.cvtColor(label_img, cv2.COLOR_BGR2GRAY)
-    rows, cols = img_gray.shape
 
+    # Converting image to grayscale and determining dimensions
+    img_gray = np.copy(img)
+    img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
+    rows,cols = img_gray.shape
+
+    # Blank image definition
+    label_img = np.zeros((rows, cols, 3), dtype=np.uint8)
+
+    # Empty List Setup
     regions = []
     region_equivs = []
+    redundant_inds = []
+    remove_inds = []
 
     for i in range(rows):
         for j in range(cols):
@@ -25,7 +33,7 @@ def CCL(img):
                     for reg_num in range(len(regions)):
                         if (i - 1, j) in regions[reg_num]:
                             top_neighbor_label = reg_num + 1
-                            
+
                 if j != 0:
                     for reg_num in range(len(regions)):
                         if (i, j - 1) in regions[reg_num]:
@@ -41,41 +49,57 @@ def CCL(img):
                 elif top_neighbor_label == left_neighbor_label:
                     regions[left_neighbor_label - 1].add((i, j))
                 else:
-                    regions[min(top_neighbor_label, left_neighbor_label)].add((i, j))
+                    regions[min(top_neighbor_label, left_neighbor_label) - 1].add((i, j))
 
-                    # Update region_equivs list to include region equivalances for second pass
-                    if region_equivs == []:
-                        region_equivs.append({top_neighbor_label, left_neighbor_label})
-                    else:
+                    if region_equivs != []:
                         for equiv_num in range(len(region_equivs)):
-                            if left_neighbor_label in region_equivs[equiv_num] or top_neighbor_label in region_equivs[equiv_num]:
+                            if region_equivs[equiv_num] & {top_neighbor_label, left_neighbor_label} != set():
+                                region_equivs[equiv_num].update([top_neighbor_label, left_neighbor_label])
                                 equiv_set = equiv_num
-                        if equiv_set != -1:
-                            region_equivs[equiv_set].update([top_neighbor_label, left_neighbor_label])
-                        else:
-                            region_equivs.append({left_neighbor_label, top_neighbor_label})
+                        if equiv_set == -1:
+                            region_equivs.append({top_neighbor_label, left_neighbor_label})
+                    else:
+                        region_equivs.append({top_neighbor_label, left_neighbor_label})
+
+    # Combining region equivalences
+    for i in range(len(region_equivs)):
+        if i not in remove_inds:
+            j = i + 1
+            while j < len(region_equivs):
+                if region_equivs[i] & region_equivs[j] != set():
+                    region_equivs[i] = region_equivs[i] | region_equivs[j]
+                    remove_inds.append(j)
+                j += 1
+    
+    # Removing unnecessary region equivalences after combining together
+    remove_inds.sort(reverse=True)
+    for ind in remove_inds:
+        region_equivs.pop(ind)
 
     # Removing redundant region labels, if necessary
-    redundant_inds = []
     if region_equivs != []:
         for equiv in region_equivs:
             min_label = min(equiv)
             equiv.remove(min_label)
             for label in equiv:
-                regions[min_label - 1] | regions[label - 1]
+                regions[min_label - 1] = regions[min_label - 1] | regions[label - 1]
                 redundant_inds.append(label - 1)
         redundant_inds.sort(reverse=True)
         for ind in redundant_inds:
             regions.pop(ind)
 
-    # Generating different colors for labeling and updating pixels
-    shades = np.linspace(0, 255, len(regions))
-    for region_ind in range(len(regions)):
-        for pixel in regions[region_ind]:
-            img_gray[pixel[0], pixel[1]] = shades[region_ind]
-
+    # Blank image setup
     label_img[:, :, 0] = 0
     label_img[:, :, 1] = 0
-    label_img[:, :, 2] = img_gray
+    label_img[:, :, 2] = 0
+
+    # Generating different colors for labeling and updating pixels
+    if len(regions) == 1:
+        shades = [255]
+    else:
+        shades = np.linspace(75, 255, len(regions), dtype=np.uint8)
+    for region_ind in range(len(regions)):
+        for pixel in regions[region_ind]:
+            label_img[pixel[0], pixel[1], 2] = shades[region_ind]
 
     return label_img,len(regions)
