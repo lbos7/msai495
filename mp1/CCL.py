@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def CCL(img):
+def CCL(img, use_size_filter=False):
 
     # Converting image to grayscale and determining dimensions
     img_gray = np.copy(img)
