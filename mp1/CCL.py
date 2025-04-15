@@ -16,6 +16,7 @@ def CCL(img, use_size_filter=False, filter_thresh=0):
     region_equivs = []
     redundant_inds = []
     remove_inds = []
+    filtered_inds = []
 
     for i in range(rows):
         for j in range(cols):
@@ -92,6 +93,16 @@ def CCL(img, use_size_filter=False, filter_thresh=0):
     label_img[:, :, 0] = 0
     label_img[:, :, 1] = 0
     label_img[:, :, 2] = 0
+
+    # Filtering
+    if use_size_filter:
+        for i in range(len(regions)):
+            if len(regions[i]) >= filter_thresh:
+                filtered_inds.append(i)
+        regions = [regions[passed_ind] for passed_ind in filtered_inds]
+            
+    # for region in regions:
+    #     print(len(region))
 
     # Generating different colors for labeling and updating pixels
     if len(regions) == 1:
