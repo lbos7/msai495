@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def CCL(img, use_size_filter=False):
+def CCL(img, use_size_filter=False, filter_thresh=0):
 
     # Converting image to grayscale and determining dimensions
     img_gray = np.copy(img)
@@ -97,7 +97,7 @@ def CCL(img, use_size_filter=False):
     if len(regions) == 1:
         shades = [255]
     else:
-        shades = np.linspace(75, 255, len(regions), dtype=np.uint8)
+        shades = np.linspace(70, 255, len(regions), dtype=np.uint8)
     for region_ind in range(len(regions)):
         for pixel in regions[region_ind]:
             label_img[pixel[0], pixel[1], 2] = shades[region_ind]
