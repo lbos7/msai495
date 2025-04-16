@@ -53,10 +53,13 @@ def Erosion(img, se):
     return cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
 
 def Opening(img, se):
-    return
+    eroded_img = Erosion(img, se)
+    return Dilation(eroded_img, se)
 
 def Closing(img, se):
-    return
+    dilated_img = Dilation(img, se)
+    return Erosion(dilated_img, se)
 
 def Boundary(img, se):
-    return
+    eroded_img = Erosion(img, se)
+    return img - eroded_img
