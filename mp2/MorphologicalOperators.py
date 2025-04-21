@@ -10,40 +10,44 @@ def Dilation(img, se):
     se_offset_rows = se[0] // 2
     se_offset_cols = se[1] // 2
 
-    white_pix_coords = np.argwhere(img_gray == 255)
+    padded_img = np.pad(img_gray, ((se_offset_rows, se_offset_rows), (se_offset_cols, se_offset_cols)), mode="constant", constant_values=0)
+
+    white_pix_coords = np.argwhere(padded_img == 255)
 
     for coord in white_pix_coords:
         i = coord[0]
         j = coord[1]
-        for row in np.unique(np.clip(np.linspace(i - se_offset_rows, i + se_offset_rows, se[0], dtype=int), 0, rows - 1)):
-                for col in np.unique(np.clip(np.linspace(j - se_offset_cols, j + se_offset_cols, se[1], dtype=int), 0, cols - 1)):
-                    img_gray[row, col] = 255
-    return cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
+        row_inds = np.repeat(np.linspace(i - se_offset_rows, i + se_offset_rows, se[0], dtype=int), se[1])
+        col_inds = np.tile(np.linspace(j - se_offset_cols, j + se_offset_cols, se[1], dtype=int), se[0])
+        padded_img[row_inds, col_inds] = 255
+    final_img = padded_img[se_offset_rows:(rows + se_offset_rows), se_offset_cols:(cols + se_offset_cols)]
+    return cv2.cvtColor(final_img, cv2.COLOR_GRAY2BGR)
 
 def Erosion(img, se):
     img_gray = np.copy(img)
     img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
     rows,cols = img_gray.shape
 
-    img_new = np.copy(img_gray)
-    img_new[:, :] = 0
-
     se_offset_rows = se[0] // 2
     se_offset_cols = se[1] // 2
 
-    white_pix_coords = np.argwhere(img_gray == 255)
+    padded_img = np.pad(img_gray, ((se_offset_rows, se_offset_rows), (se_offset_cols, se_offset_cols)), mode="constant", constant_values=0)
+    img_new = np.copy(padded_img)
+    img_new[:, :] = 0
+
+    white_pix_coords = np.argwhere(padded_img == 255)
 
     for coord in white_pix_coords:
         i = coord[0]
         j = coord[1]
-        sum = 0
-        for row in np.unique(np.clip(np.linspace(i - se_offset_rows, i + se_offset_rows, se[0], dtype=int), 0, rows - 1)):
-            for col in np.unique(np.clip(np.linspace(j - se_offset_cols, j + se_offset_cols, se[1], dtype=int), 0, cols - 1)):
-                sum += img_gray[row, col]
+        row_inds = np.repeat(np.linspace(i - se_offset_rows, i + se_offset_rows, se[0], dtype=int), se[1])
+        col_inds = np.tile(np.linspace(j - se_offset_cols, j + se_offset_cols, se[1], dtype=int), se[0])
+        sum = np.sum(padded_img[row_inds, col_inds], dtype=int)
         if sum == 255*se[0]*se[1]:
             img_new[i, j] = 255
 
-    return cv2.cvtColor(img_new, cv2.COLOR_GRAY2BGR)
+    final_img = img_new[se_offset_rows:(rows + se_offset_rows), se_offset_cols:(cols + se_offset_cols)]
+    return cv2.cvtColor(final_img, cv2.COLOR_GRAY2BGR)
 
 def Opening(img, se):
     eroded_img = Erosion(img, se)
