@@ -2,6 +2,18 @@ import cv2
 import numpy as np
 
 def CCL(img, use_size_filter=False, filter_thresh=0):
+    '''
+    Uses the connected component labeling technique to identify regions in an image.
+    
+    Parameters:
+        img (numpy array): The image the operation will be performed on.
+        use_size_filter (bool): Whether or not to use a size filter.
+        filter_thresh (int): The filtering threshold of the size filter.
+        
+    Returns:
+        (numpy array): The labeled image.
+        (int): The number of regions.
+    '''
 
     # Converting image to grayscale and determining dimensions
     img_gray = np.copy(img)
