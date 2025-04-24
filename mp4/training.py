@@ -18,11 +18,17 @@ for f in cropped_images_folder.iterdir():
         h_vals.extend(img_hsv[:, :, 0].flatten())
         s_vals.extend(img_hsv[:, :, 1].flatten())
 
-hist, xedges, yedges = np.histogram2d(h_vals, s_vals, bins=[180, 256], range=[[0, 179], [0, 255]], density=True)
+hist, xedges, yedges = np.histogram2d(h_vals, s_vals, bins=[180, 256], range=[[0, 179], [0, 255]])
+
+log_hist = np.log1p(hist)
+
+# Normalize for display
+log_hist_norm = cv2.normalize(log_hist, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+log_hist_norm = log_hist_norm.astype(np.uint8)
 
 plt.figure(1)
-plt.imshow(hist.T, interpolation='nearest', origin='lower', aspect='auto')
-plt.colorbar(label='Probability')
+plt.imshow(log_hist_norm.T, interpolation='nearest', origin='lower', aspect='auto')
+plt.colorbar(label='Normalized Value')
 plt.xlabel('Hue')
 plt.ylabel('Saturation')
 plt.title('2D Histogram of Hue and Saturation')
