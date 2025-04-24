@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 from pathlib import Path
 
+# Set up images folder
 images_folder_path = 'mp4/images/'
 images_folder = Path(images_folder_path)
 
@@ -23,13 +24,6 @@ def onselect(eclick, erelease):
     # Crop the image and add it to the list of cropped images
     cropped = img[ymin:ymax, xmin:xmax]
     cropped_images.append(cropped)
-
-    # Show the cropped image
-    # plt.figure()
-    # plt.imshow(cropped)
-    # plt.title("Cropped Image")
-    # plt.axis("off")
-    # plt.show()
 
 
 for f in images_folder.iterdir():
