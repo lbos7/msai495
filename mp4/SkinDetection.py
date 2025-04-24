@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def SkinDetection(img, hist_data, thresh=100):
+def SkinDetection(img, hist_data, thresh=0):
 
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     rows,cols,channels = img_hsv.shape
