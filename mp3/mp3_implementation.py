@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 from HistoEqualization import HistoEqualization
 
 moon_img = cv2.imread('mp3/images/moon.bmp')
