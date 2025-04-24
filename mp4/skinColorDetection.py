@@ -6,11 +6,33 @@ from pathlib import Path
 
 images_folder_path = 'mp4/images/'
 images_folder = Path(images_folder_path)
-image_filenames = ['gun1.bmp', 'joy1.bmp', 'pointer1.bmp']
-img = plt.imread('mp4/images/gun1.bmp')
+
+# def onselect(eclick, erelease):
+#     # Get corner coordinates
+#     x1, y1 = int(eclick.xdata), int(eclick.ydata)
+#     x2, y2 = int(erelease.xdata), int(erelease.ydata)
+
+#     # Ensure coordinates are in correct order
+#     xmin, xmax = sorted([x1, x2])
+#     ymin, ymax = sorted([y1, y2])
+
+#     # Crop the image
+#     cropped = img[ymin:ymax, xmin:xmax]
+
+#     # Show cropped image
+#     plt.figure()
+#     plt.imshow(cropped)
+#     plt.title("Cropped Image")
+#     plt.axis("off")
+#     plt.show()
+
+#     # Save using OpenCV (handles JPG/PNG well)
+#     # save_path = 'cropped_output.jpg'
+#     global cropped_bgr
+#     cropped_bgr = (cropped[:, :, :3] * 255).astype('uint8') if cropped.dtype == float else cropped
 
 def onselect(eclick, erelease):
-    # Get corner coordinates
+    # Get the corner coordinates of the selection
     x1, y1 = int(eclick.xdata), int(eclick.ydata)
     x2, y2 = int(erelease.xdata), int(erelease.ydata)
 
@@ -18,26 +40,24 @@ def onselect(eclick, erelease):
     xmin, xmax = sorted([x1, x2])
     ymin, ymax = sorted([y1, y2])
 
-    # Crop the image
+    # Crop the image and add it to the list of cropped images
     cropped = img[ymin:ymax, xmin:xmax]
+    cropped_images.append(cropped)
 
-    # Show cropped image
+    # Show the cropped image
     plt.figure()
     plt.imshow(cropped)
     plt.title("Cropped Image")
     plt.axis("off")
     plt.show()
 
-    # Save using OpenCV (handles JPG/PNG well)
-    # save_path = 'cropped_output.jpg'
-    global cropped_bgr
-    cropped_bgr = (cropped[:, :, :3] * 255).astype('uint8') if cropped.dtype == float else cropped
-
 
 for f in images_folder.iterdir():
     if f.is_file() and f.name[-12:] != '_cropped.png':
 
         img = plt.imread(images_folder_path + f.name)
+
+        cropped_images = []  # List to store cropped images
 
         fig, ax = plt.subplots()
         ax.imshow(img)
@@ -47,5 +67,10 @@ for f in images_folder.iterdir():
                                    button=[1], minspanx=5, minspany=5, spancoords='pixels',
                                    interactive=True)
         plt.show()
-        save_path = images_folder_path + f.name[:-4] + '_cropped.png'
-        cv2.imwrite(save_path, cv2.cvtColor(cropped_bgr, cv2.COLOR_RGB2BGR))
+        # save_path = images_folder_path + f.name[:-4] + '_cropped.png'
+        # cv2.imwrite(save_path, cv2.cvtColor(cropped_bgr, cv2.COLOR_RGB2BGR))
+        for idx, cropped in enumerate(cropped_images):
+            cropped_bgr = (cropped[:, :, :3] * 255).astype('uint8') if cropped.dtype == float else cropped
+            save_path = f.with_name(f"{f.stem}_cropped_{idx+1}.png")
+            cv2.imwrite(str(save_path), cv2.cvtColor(cropped_bgr, cv2.COLOR_RGB2BGR))
+            print(f"Saved: {save_path}")
