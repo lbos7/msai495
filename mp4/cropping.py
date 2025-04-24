@@ -25,11 +25,11 @@ def onselect(eclick, erelease):
     cropped_images.append(cropped)
 
     # Show the cropped image
-    plt.figure()
-    plt.imshow(cropped)
-    plt.title("Cropped Image")
-    plt.axis("off")
-    plt.show()
+    # plt.figure()
+    # plt.imshow(cropped)
+    # plt.title("Cropped Image")
+    # plt.axis("off")
+    # plt.show()
 
 
 for f in images_folder.iterdir():
