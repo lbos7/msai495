@@ -33,15 +33,17 @@ def onselect(eclick, erelease):
     global cropped_bgr
     cropped_bgr = (cropped[:, :, :3] * 255).astype('uint8') if cropped.dtype == float else cropped
 
-fig, ax = plt.subplots()
-
 
 for f in images_folder.iterdir():
-    if f.is_file() and f.name[-4:] == '.bmp':
-        print(f.name)
+    if f.is_file() and f.name[-12:] != '_cropped.png':
+
         img = plt.imread(images_folder_path + f.name)
+
+        fig, ax = plt.subplots()
         ax.imshow(img)
-        rect_selector = RectangleSelector(ax, onselect, drawtype='box', useblit=True,
+        ax.set_title(f.name)
+
+        rect_selector = RectangleSelector(ax, onselect, useblit=True,
                                    button=[1], minspanx=5, minspany=5, spancoords='pixels',
                                    interactive=True)
         plt.show()
