@@ -18,8 +18,7 @@ for f in cropped_images_folder.iterdir():
         h_vals.extend(img_hsv[:, :, 0].flatten())
         s_vals.extend(img_hsv[:, :, 1].flatten())
 
-hist, xedges, yedges = np.histogram2d(h_vals, s_vals, bins=[180, 256], range=[[0, 179], [0, 255]])
-
+hist, h_edges, s_edges = np.histogram2d(h_vals, s_vals, bins=[180, 256], range=[[0, 179], [0, 255]])
 log_hist = np.log1p(hist)
 
 # Normalize for display
@@ -33,3 +32,5 @@ plt.xlabel('Hue')
 plt.ylabel('Saturation')
 plt.title('2D Histogram of Hue and Saturation')
 plt.show()
+
+np.savez('skin_hist.npz', hist=log_hist_norm, h_edges=h_edges, s_edges=s_edges)
