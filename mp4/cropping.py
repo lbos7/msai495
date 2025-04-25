@@ -13,6 +13,15 @@ cropped_images_folder = images_folder / 'cropped_images'
 cropped_images_folder.mkdir(exist_ok=True)  # Will not raise error if the folder already exists
 
 def onselect(eclick, erelease):
+    '''
+    Applies the histogram equalization to a given image.
+    
+    Parameters:
+        eclick (MouseEvent): The mouse event when the starting point of the rectangle is selected.
+        erelease (MouseEvent): The mouse event when the ending point of the rectangle is released.
+        
+    '''
+
     # Get the corner coordinates of the selection
     x1, y1 = int(eclick.xdata), int(eclick.ydata)
     x2, y2 = int(erelease.xdata), int(erelease.ydata)
@@ -25,18 +34,22 @@ def onselect(eclick, erelease):
     cropped = img[ymin:ymax, xmin:xmax]
     cropped_images.append(cropped)
 
-
+# Loop through images to obtained cropped images
 for f in images_folder.iterdir():
     if f.is_file():
 
+        # Read image
         img = plt.imread(images_folder_path + f.name)
 
+        # Set up empty list of cropped images
         cropped_images = []
 
+        # Set up plot
         fig, ax = plt.subplots()
         ax.imshow(img)
         ax.set_title(f.name)
 
+        # Used for selecting rectangle to crop images
         rect_selector = RectangleSelector(ax, onselect, useblit=True,
                                          button=[1], minspanx=5, minspany=5, spancoords='pixels',
                                          interactive=True)
