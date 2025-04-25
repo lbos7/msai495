@@ -39,4 +39,4 @@ plt.title('2D Histogram of Hue and Saturation')
 plt.show()
 
 # Saving histogram data for later use
-np.savez('skin_hist.npz', hist=log_hist_norm, h_edges=h_edges, s_edges=s_edges)
+np.savez('mp4/skin_hist.npz', hist=log_hist_norm, h_edges=h_edges, s_edges=s_edges)
