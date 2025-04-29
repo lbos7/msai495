@@ -15,7 +15,8 @@ def Dilation(img, se):
 
     # Converting image to grayscale and determining dimensions
     img_gray = np.copy(img)
-    img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
+    if len(img_gray.shape) == 3:
+        img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
     rows,cols = img_gray.shape
 
     # Determining the offsets from the center pixel of the structuring element
@@ -56,7 +57,8 @@ def Erosion(img, se):
 
     # Converting image to grayscale and determining dimensions
     img_gray = np.copy(img)
-    img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
+    if len(img_gray.shape) == 3:
+        img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
     rows,cols = img_gray.shape
 
     # Determining the offsets from the center pixel of the structuring element
