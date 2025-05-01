@@ -71,3 +71,29 @@ def NonmaximaSupress(mag, theta):
                 mag_suppressed[i - 1, j - 1] = 0
 
     return mag_suppressed
+
+def EdgeLinking(mag_low, mag_high):
+    rows, cols = mag_high.shape
+    edges = np.zeros((rows, cols), dtype=np.uint8)
+    visited = np.zeros((rows, cols), dtype=bool)
+
+    def dfs(i, j):
+        if visited[i, j]:
+            return
+        visited[i, j] = True
+        edges[i, j] = 255
+
+        for di in [-1, 0, 1]:
+            for dj in [-1, 0, 1]:
+                ni, nj = i + di, j + dj
+                if (0 <= ni < rows) and (0 <= nj < cols):
+                    if not visited[ni, nj] and mag_low[ni, nj]:
+                        dfs(ni, nj)
+
+    # Start DFS from all strong edge pixels
+    for i in range(rows):
+        for j in range(cols):
+            if mag_high[i, j] and not visited[i, j]:
+                dfs(i, j)
+
+    return edges
