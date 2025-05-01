@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from CannyEdgeDetection import GaussSmoothing
+from CannyEdgeDetection import GaussSmoothing, ImageGradient, FindThreshold, NonmaximaSuppress, EdgeLinking, CannyEdgeDetection
 
 joy1 = cv2.imread('mp5/images/joy1.bmp')
 pointer1 = cv2.imread('mp5/images/pointer1.bmp')
@@ -13,6 +13,11 @@ pointer1_smoothed = GaussSmoothing(pointer1, 5, 1)
 lena_smoothed = GaussSmoothing(lena, 5, 1)
 test1_smoothed = GaussSmoothing(test1, 5, 1)
 
+joy1_edges = CannyEdgeDetection(joy1, sigma=2)
+pointer1_edges = CannyEdgeDetection(pointer1, sigma=2)
+lena_edges = CannyEdgeDetection(lena, sigma=2)
+test1_edges = CannyEdgeDetection(test1, sigma=2)
+
 cv2.imshow('joy1.bmp', joy1)
 cv2.imshow('pointer1.bmp', pointer1)
 cv2.imshow('lena.bmp', lena)
@@ -21,5 +26,9 @@ cv2.imshow('Smoothed joy1.bmp', joy1_smoothed)
 cv2.imshow('Smoothed pointer1.bmp', pointer1_smoothed)
 cv2.imshow('Smoothed lena.bmp', lena_smoothed)
 cv2.imshow('Smoothed test1.bmp', test1_smoothed)
+cv2.imshow('Edges of joy1.bmp', joy1_edges)
+cv2.imshow('Edges of pointer1.bmp', pointer1_edges)
+cv2.imshow('Edges of lena.bmp', lena_edges)
+cv2.imshow('Edges of test1.bmp', test1_edges)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -2,13 +2,13 @@ import cv2
 import numpy as np
 from scipy.signal import convolve2d
 
-def GaussSmoothing(img, N, Sigma):
+def GaussSmoothing(img, N=5, sigma=1):
     img_gray = np.copy(img)
     if len(img_gray.shape) == 3:
         img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
-    ax = np.linspace(-(N //2 ), N // 2, N)
+    ax = np.linspace(-(N // 2), N // 2, N)
     xx, yy = np.meshgrid(ax, ax)
-    kernel = np.exp(-(xx**2 + yy**2) / (2. * Sigma**2))
+    kernel = np.exp(-(xx**2 + yy**2) / (2. * sigma**2))
     kernel_norm = kernel / np.sum(kernel)
     img_smoothed = np.clip(convolve2d(img_gray, kernel_norm, mode='same', boundary='symm'), 0, 255).astype(np.uint8)
     return cv2.cvtColor(img_smoothed, cv2.COLOR_GRAY2BGR)
@@ -17,11 +17,11 @@ def ImageGradient(img_smoothed, N=5):
     img_gray = np.copy(img_smoothed)
     if len(img_gray.shape) == 3:
         img_gray = cv2.cvtColor(img_gray, cv2.COLOR_BGR2GRAY)
-    gradient_x = cv2.Sobel(img_smoothed, cv2.CV_64F, 1, 0, ksize=N)
-    gradient_y = cv2.Sobel(img_smoothed, cv2.CV_64F, 0, 1, ksize=N)
+    gradient_x = cv2.Sobel(img_gray, cv2.CV_64F, 1, 0, ksize=N)
+    gradient_y = cv2.Sobel(img_gray, cv2.CV_64F, 0, 1, ksize=N)
     mag = np.sqrt(gradient_x**2 + gradient_y**2)
     theta = np.arctan2(gradient_y, gradient_x)
-    return mag,theta
+    return mag, theta
 
 def FindThreshold(mag, percentageOfNonEdge=.8):
     hist,bins = np.histogram(mag.flatten(), bins=int(np.max(mag)), density=True)
@@ -31,8 +31,8 @@ def FindThreshold(mag, percentageOfNonEdge=.8):
     T_low = 0.5 * T_high
     return T_high,T_low
 
-def NonmaximaSupress(mag, theta):
-    rows, cols = mag.shape
+def NonmaximaSuppress(mag, theta):
+    rows,cols = mag.shape
     mag_suppressed = np.zeros((rows, cols))
 
     mag_padded = np.pad(mag, pad_width=1, mode='edge')
@@ -73,7 +73,7 @@ def NonmaximaSupress(mag, theta):
     return mag_suppressed
 
 def EdgeLinking(mag_low, mag_high):
-    rows, cols = mag_high.shape
+    rows,cols = mag_high.shape
     edges = np.zeros((rows, cols), dtype=np.uint8)
     visited = np.zeros((rows, cols), dtype=bool)
 
@@ -97,3 +97,13 @@ def EdgeLinking(mag_low, mag_high):
                 dfs(i, j)
 
     return edges
+
+def CannyEdgeDetection(img, N=5, sigma=1, percentageOfNonEdge=.8):
+    img_smoothed = GaussSmoothing(img, N=N, sigma=sigma)
+    mag,theta = ImageGradient(img_smoothed, N=N)
+    T_high,T_low = FindThreshold(mag, percentageOfNonEdge=percentageOfNonEdge)
+    mag_suppressed = NonmaximaSuppress(mag, theta)
+    mag_high = (mag_suppressed >= T_high).astype(np.uint8)
+    mag_low = (mag_suppressed >= T_low).astype(np.uint8)
+    edges = EdgeLinking(mag_low, mag_high)
+    return cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
