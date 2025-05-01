@@ -89,6 +89,7 @@ def FindThreshold(mag, percentageOfNonEdge=.8):
 
     return T_high,T_low
 
+
 def NonmaximaSuppress(mag, theta):
     '''
     Suppresses pixel magnitudes that are not maximas.
@@ -144,6 +145,7 @@ def NonmaximaSuppress(mag, theta):
 
     return mag_suppressed
 
+
 def EdgeLinking(mag_low, mag_high):
     '''
     Links edges that have been detected on an image.
@@ -197,6 +199,7 @@ def EdgeLinking(mag_low, mag_high):
 
     return edges
 
+
 def CannyEdgeDetection(img, N=5, sigma=1, percentageOfNonEdge=.8):
     '''
     Performs Canny edge detection on an image.
@@ -229,5 +232,5 @@ def CannyEdgeDetection(img, N=5, sigma=1, percentageOfNonEdge=.8):
 
     # Linking edges
     edges = EdgeLinking(mag_low, mag_high)
-    
+
     return cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
