@@ -31,5 +31,43 @@ def FindThreshold(mag, percentageOfNonEdge=.8):
     T_low = 0.5 * T_high
     return T_high,T_low
 
-def NonmaximaSupress(mag, theta, method):
-    pass
+def NonmaximaSupress(mag, theta):
+    rows, cols = mag.shape
+    mag_suppressed = np.zeros((rows, cols))
+
+    mag_padded = np.pad(mag, pad_width=1, mode='edge')
+    theta_padded = np.pad(theta, pad_width=1, mode='edge')
+
+    # Quantize angles to 4 main directions
+    angle = theta_padded * 180. / np.pi
+    angle[angle < 0] += 180
+
+    for i in range(1, rows + 1):
+        for j in range(1, cols + 1):
+            q = 0
+            r = 0
+
+            # angle 0
+            if (0 <= angle[i,j] < 22.5) or (157.5 <= angle[i,j] <= 180):
+                q = mag_padded[i, j+1]
+                r = mag_padded[i, j-1]
+            # angle 45
+            elif (22.5 <= angle[i,j] < 67.5):
+                q = mag_padded[i+1, j-1]
+                r = mag_padded[i-1, j+1]
+            # angle 90
+            elif (67.5 <= angle[i,j] < 112.5):
+                q = mag_padded[i+1, j]
+                r = mag_padded[i-1, j]
+            # angle 135
+            elif (112.5 <= angle[i,j] < 157.5):
+                q = mag_padded[i-1, j-1]
+                r = mag_padded[i+1, j+1]
+
+            # Keep pixel if it's a local maximum
+            if (mag_padded[i,j] >= q) and (mag_padded[i,j] >= r):
+                mag_suppressed[i - 1, j - 1] = mag_padded[i,j]
+            else:
+                mag_suppressed[i - 1, j - 1] = 0
+
+    return mag_suppressed
