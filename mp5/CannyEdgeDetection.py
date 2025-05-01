@@ -22,3 +22,14 @@ def ImageGradient(img_smoothed, N=5):
     mag = np.sqrt(gradient_x**2 + gradient_y**2)
     theta = np.arctan2(gradient_y, gradient_x)
     return mag,theta
+
+def FindThreshold(mag, percentageOfNonEdge=.8):
+    hist,bins = np.histogram(mag.flatten(), bins=int(np.max(mag)), density=True)
+    cdf = np.cumsum(hist)
+    ind = np.where(cdf > percentageOfNonEdge)[0][0]
+    T_high = bins[ind]
+    T_low = 0.5 * T_high
+    return T_high,T_low
+
+def NonmaximaSupress(mag, theta, method):
+    pass
