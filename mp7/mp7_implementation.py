@@ -1,4 +1,4 @@
-from mp7.ImageTracking import ImageTracking
+from ImageTracking import ImageTracking
 
 image_folder = 'mp7/image_girl'
 output_folder = 'mp7/tracking_output'
@@ -7,7 +7,7 @@ output_folder = 'mp7/tracking_output'
 positions = ImageTracking(
     image_folder,
     output_folder,
-    method='ncc',
+    method='cc',
     search_radius=25,
     save_video=True,
     video_name='mp7/girl_head_tracking.mp4'
