@@ -1,10 +1,10 @@
-from mp7.ImageTracking import template_match_track
+from mp7.ImageTracking import ImageTracking
 
 image_folder = 'mp7/image_girl'
 output_folder = 'mp7/tracking_output'
 
 # Options for method: 'ssd', 'cc', 'ncc'
-positions = template_match_track(
+positions = ImageTracking(
     image_folder,
     output_folder,
     method='ncc',
